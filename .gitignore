@@ -1,0 +1,28 @@
+# Entornos Virtuales
+venv/
+env/
+.env
+
+# Archivos de caché y compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Caché de Pytest y testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs e información de configuración de editores
+.vscode/
+.idea/
+*.log
+
+# Opcional: Caché de herramientas si usas algo extra
+.ruff_cache/
+.mypy_cache/
+
+# Archivos del sistema operativo (Mac/Linux)
+.DS_Store
+Thumbs.db
