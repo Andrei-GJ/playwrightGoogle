@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from database.connect.dataBaseConnect import connectDB, engine, MetaData, Table, insert
 
 # class Contacts:
@@ -19,13 +20,20 @@ def updateContact(dataContact):
 
     try:
         with engine.connect() as conn:
-            updateClient = insert(Contacts).values(
-                name=dataContact['name'], 
-                phone=dataContact['phone'],
-                hasContact=dataContact['hasContact']
-            )
-            conn.execute(updateClient)
-            conn.commit()
+            # 1. Consultamos si el teléfono ya existe en la BD
+            check_stmt = select(Contacts).where(Contacts.c.phone == dataContact['phone'])
+            result = conn.execute(check_stmt).fetchone()
+            
+            # 2. Si no existe un resultado (es decir, es nuevo), ejecutamos el insert
+            if not result:
+                updateClient = insert(Contacts).values(
+                    name=dataContact['name'], 
+                    phone=dataContact['phone'],
+                    hasContact=dataContact['hasContact']
+                )
+                conn.execute(updateClient)
+                conn.commit()
+            # Si ya existe, no intentamos insertar y así evitamos quemar un auto-incremental (ID)
     except Exception as e:
         print(e)
     finally:

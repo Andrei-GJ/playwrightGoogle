@@ -47,8 +47,13 @@ def setDataClient(name, dataClient, phone):
 def validateEndList(page: Page):
     if page.get_by_text("Has llegado al final de la lista.").count() > 0:
         return False
-    else:
-        panel = page.locator('div[role="feed"]')
+    
+    # Intentamos localizar el panel de resultados (feed)
+    panel = page.locator('div[role="feed"]')
+    if panel.count() > 0:
         panel.evaluate("el => el.scrollTop = el.scrollHeight")
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(2000) # Un poco más de tiempo para el scroll
         return True
+    
+    # Si no hay panel, puede que haya pocos resultados y ya terminaron
+    return False
