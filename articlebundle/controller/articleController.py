@@ -29,6 +29,13 @@ def getDataClient(page: Page, dataClient):
         article.click()
 
         sliderArticle = page.get_by_role("main", name=name)
+        
+        try:
+            # Esperamos explícitamente a que aparezca el panel detalle
+            sliderArticle.wait_for(state="visible", timeout=2000)
+        except Exception:
+            pass
+
         phone = sliderArticle.locator('button[aria-label*="Teléfono"]')
 
         if phone.count() > 0:

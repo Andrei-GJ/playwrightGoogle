@@ -35,9 +35,4 @@ def updateContact(dataContact):
                 conn.commit()
             # Si ya existe, no intentamos insertar y así evitamos quemar un auto-incremental (ID)
     except Exception as e:
-        print(e)
-    finally:
-        conn.close()
-        engine.dispose()
-
-    
+        print(f"Error guardando contacto en BD: {e}")
