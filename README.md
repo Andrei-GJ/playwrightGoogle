@@ -1,74 +1,62 @@
-# Playwright Google Maps Scraper 🗺️🦷
+# Playwright Google Maps Scraper
 
-Un script automatizado construido con Python, Playwright, y Pytest diseñado para extraer información pública de contacto desde Google Maps. Específicamente, este proyecto busca perfiles, omitiendo resultados patrocinados o lugares que ya tienen sitio web, para luego guardar los contactos localizados directo en una base de datos de PostgreSQL de forma asíncrona.
+Automatización headless construida con Python, Playwright, SQLAlchemy y Pytest para extraer información pública de contacto desde Google Maps, filtrar resultados patrocinados o comercios que ya cuentan con sitio web y persistir los registros de forma asíncrona en PostgreSQL.
 
-## 🚀 Características
-- **Scraping Dinámico**: Hace scroll automáticamente para cargar más resultados locales y simula el clic en Google Maps.
-- **Filtrado Inteligente**: Ignora resultados *"Patrocinados"* y lugares que ya tienen botón de *"Sitio Web"*.
-- **Conformidad de Datos**: Limpia automáticamente los números de teléfono antes de subirlos a la base de datos.
-- **Inserción Asíncrona**: Usa `threading` de Python para que la inserción de registros a la base de datos (Supabase) no bloquee el recorrido del scrapper.
+## Características
 
----
+- **Scraping dinámico:** scroll automático sobre resultados locales e interacción programática con fichas de Google Maps.
+- **Filtrado inteligente:** omite anuncios patrocinados y perfiles que ya disponen de sitio web propio.
+- **Normalización de datos:** limpieza y saneamiento de números telefónicos antes de persistir en base de datos.
+- **Inserción asíncrona:** uso de hilos (`threading`) para ejecutar las escrituras en PostgreSQL sin bloquear el recorrido de Playwright.
 
-## 🛠️ Tecnologías Utilizadas
-- **Lenguaje:** Python 3
-- **Scraping / Testing:** [Playwright](https://playwright.dev/python/) y [Pytest](https://docs.pytest.org/en/7.1.x/)
-- **Base de Datos:** [PostgreSQL](https://www.postgresql.org/) (Alojado en Supabase)
-- **ORM / Consultas:** [SQLAlchemy](https://www.sqlalchemy.org/)
+## Stack Tecnológico
 
----
+- **Lenguaje:** Python 3.10+
+- **Automatización y Runner:** Playwright, Pytest
+- **Persistencia:** PostgreSQL (Supabase), SQLAlchemy
 
-## ⚙️ Configuración y Requisitos
+## Configuración y Ejecución
 
-### 1. Requerimientos del Sistema
-Asegúrate de tener instalado Python 3.10 o superior y configurar un entorno virtual (muy recomendado).
+### 1. Entorno e instalación de dependencias
 
-### 2. Instalar Dependencias
-Instala los paquetes necesarios corriendo el siguiente comando:
 ```bash
-pip install pytest pytest-playwright pytest-base-url sqlalchemy python-dotenv psycopg2-binary
-```
-
-Una vez instalados los paquetes de Playwright, instala los navegadores necesarios ejecutando:
-```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 playwright install chromium
 ```
 
-### 3. Configuración de Variables de Entorno (`.env`)
-Debes crear un archivo **`.env`** en la carpeta principal del proyecto. Este archivo está ignorado por GitHub, así que es seguro.
+### 2. Variables de entorno (`.env`)
 
-Agrega la cadena de conexión de tu base de datos Supabase:
+Crea un archivo `.env` en la raíz del proyecto (ignorado por Git) con la cadena de conexión a PostgreSQL:
+
 ```env
 DATABASE_URL="postgresql://usuario:contraseña@servidor.supabase.co:6543/postgres"
 ```
 
-### 4. Configurar la Base de Datos (Supabase)
-Asegúrate de tener una tabla llamada `contacts` con, al menos, la siguiente estructura:
-- `id`: llave primaria
-- `name`: Text o Varchar
-- `phone`: Text o BIGINT *(No usar integer simple por el tamaño de los números colombianos)*
-- `hasContact`: Boolean
+### 3. Esquema de base de datos
 
----
+Tabla `contacts` en PostgreSQL:
 
-## 💻 ¿Cómo funciona y cómo ejecutarlo?
+- `id`: clave primaria
+- `name`: `TEXT` / `VARCHAR`
+- `phone`: `TEXT` / `BIGINT`
+- `hasContact`: `BOOLEAN`
 
-La prueba automatizada está estructurada dentro de un suite the Pytest. 
-Para ejecutar el scrapper de forma visible en pantalla (para que puedas ver la magia ocurriendo), ejecuta:
+### 4. Ejecución
 
 ```bash
+# Ejecución con salida por consola en vivo
 pytest -s
-```
-*(El uso de del flag `-s` en `pytest` permite capturar los prints por consola que se ejecutan durante la ejecución en vivo).*
 
-Si te da problemas de entorno con el base url o quieres correr el script abriendo el navegador gráfico puedes añadir `--headed`:
-```bash
+# Ejecución con navegador visible
 pytest -s --headed
 ```
 
-## 📂 Organización de Archivos Principales
-* `index.py`: Script principal de la prueba Playwright (Punto de entrada de Pytest)
-* `articlebundle/controller/articleController.py`: Lógica del scrapper, clics, y recolección inteligente de datos.
-* `articlebundle/async_task/asynController.py`: Crea los hilos (threads) paralelos para guardar la data.
-* `database/connect/dataBaseConnect.py`: Gestiona la conexión global SQLAlchemy al motor.
-* `database/models/contacts.py`: Modelo final encargado del INSERT en SQL.
+## Estructura del Proyecto
+
+- `index.py`: punto de entrada principal ejecutado por Pytest.
+- `articlebundle/controller/articleController.py`: lógica de navegación, clics y extracción de datos.
+- `articlebundle/async_task/asynController.py`: gestión de hilos paralelos para inserción en base de datos.
+- `database/connect/dataBaseConnect.py`: configuración de la conexión global con SQLAlchemy.
+- `database/models/contacts.py`: modelo relacional y operación de inserción en `contacts`.

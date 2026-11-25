@@ -1,0 +1,6 @@
+pytest
+pytest-playwright
+pytest-base-url
+sqlalchemy
+python-dotenv
+psycopg2-binary
